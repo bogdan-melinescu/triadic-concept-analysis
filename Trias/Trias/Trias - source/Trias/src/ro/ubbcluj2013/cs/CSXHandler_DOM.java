@@ -24,14 +24,12 @@ public class CSXHandler_DOM {
 	private static Document doc;
 	
 	//The resulting objects
-	private ArrayList<CSXObject> csxObjectList;
-	private ArrayList<String> diagramNameList;
+	private ArrayList<CSXDiagram> diagramObjectList;
 	
 	public CSXHandler_DOM( String _csxFilePath ) {
 		this.csxFilePath = _csxFilePath;
 		
-		try {
-			
+		try {			
 			this.csxFile = new File(this.csxFilePath);
 			
 			this.dbFactory = DocumentBuilderFactory.newInstance();
@@ -40,8 +38,7 @@ public class CSXHandler_DOM {
 			
 			doc.getDocumentElement().normalize();
 			
-			csxObjectList = new ArrayList<CSXObject>();
-			diagramNameList = new ArrayList<String>();
+			this.diagramObjectList = new ArrayList<CSXDiagram>();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -56,14 +53,10 @@ public class CSXHandler_DOM {
 	 * @return the list of all the CSX objects that interest 
 	 * further
 	 */
-	public ArrayList<CSXObject> loadFromCSX() {
+	public ArrayList<CSXDiagram> loadFromCSX() {
 		
-		//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-	 
 		NodeList diagramNodeList = doc.getElementsByTagName("diagram");
-	 
-		//System.out.println("----------------------------");
-		
+	 		
 		/*
 		 * the CSX file is an XML, and the only element thatwe need are
 		 * the <object> <attribute> and <diagram> tags
@@ -72,14 +65,13 @@ public class CSXHandler_DOM {
 				diagListIter++) {
 			
 			//For every diagram node
+			CSXDiagram diagramObject = new CSXDiagram();
 			
 			Element diagNode = (Element) diagramNodeList.item(diagListIter);
 			
 			String diagName = diagNode.getAttribute("title");
-			
-			this.diagramNameList.add(diagName);
-			
-			//System.out.println("diagrame name: " + diagName);
+				
+			diagramObject.setDiagramName(diagName);
 						
 			NodeList nodeList = diagNode.getElementsByTagName("node");
 			
@@ -104,21 +96,16 @@ public class CSXHandler_DOM {
 						if( attributeList.item(iter) != null ) {
 							attributeName = attributeList.item(iter).getTextContent();
 						}
-						System.out.println("object name: " + objectName);
-						System.out.println("attribute name: " + attributeName);
-						
 						temporaryObject = new CSXObject(diagName, objectName, attributeName);
 						
-						csxObjectList.add(temporaryObject);
+						diagramObject.addObject(temporaryObject);
 					}
 				}
-			nodeListIter++;	
+				nodeListIter++;	
 			}
+			this.diagramObjectList.add(diagramObject);
 		}
-		return csxObjectList;
-	}
-
-	public ArrayList<String> getDiagramNameList() {
-		return this.diagramNameList;
+		//return csxObjectList;
+		return this.diagramObjectList;
 	}
 }

@@ -15,27 +15,23 @@ public class ElbaCSXImporter {
 	//Class that handles the parsing
 	private CSXHandler_DOM csxHandler;
 	
+	//The resulted colected data:		
+	private ArrayList<CSXDiagram> diagramObjectList;
 	
-	//The resulted colected data:
+	private ArrayList<CSXMetaDiagram> attributeMetaDiagramList;
+	private ArrayList<CSXMetaDiagram> conditionMedaDiagramList;
 	
-	//The objects that we use further
-	private ArrayList<CSXObject> csxObjectList;
-	
-	//The list of diagram names
-	private ArrayList<String> diagramNameList;
-	
-
 	public ElbaCSXImporter(String _csxFilePath){
 		this.csxFilePath = _csxFilePath;
 		
 		this.csxHandler = new CSXHandler_DOM( this.csxFilePath );
 		
-		this.csxObjectList = csxHandler.loadFromCSX();
-		this.diagramNameList = csxHandler.getDiagramNameList();
+		this.diagramObjectList = csxHandler.loadFromCSX();
+		
+		this.attributeMetaDiagramList = new ArrayList<CSXMetaDiagram>();
+		this.conditionMedaDiagramList = new ArrayList<CSXMetaDiagram>();
 	}
 	
-	
-
 	//Getters and setters
 	public String getCsxFilePath() {
 		return csxFilePath;
@@ -44,21 +40,73 @@ public class ElbaCSXImporter {
 	public void setCsxFilePath(String csxFilePath) {
 		this.csxFilePath = csxFilePath;
 	}
-
-	public ArrayList<CSXObject> getCsxObjectList() {
-		return csxObjectList;
-	}
-
-	public void setCsxObjectList(ArrayList<CSXObject> csxObjectList) {
-		this.csxObjectList = csxObjectList;
+	
+	public ArrayList<CSXDiagram> getDiagramObjectList() {
+		return this.diagramObjectList;
 	}
 	
 	public ArrayList<String> getDiagramNameList() {
-		return diagramNameList;
+		ArrayList<String> diagramListName = new ArrayList<String>();
+		
+		for( CSXDiagram diagramObject : this.diagramObjectList ) {
+			diagramListName.add(diagramObject.getDiagramName());
+		}
+		
+		return diagramListName;
+	}
+	
+	public void addAttributeMetaDiagram(String _diagramNames) {
+		CSXMetaDiagram csxMD = createMetaDiagram(_diagramNames);
+		
+		this.attributeMetaDiagramList.add(csxMD);
+	}
+	
+	public void addConditionMetaDiagram(String _diagramNames) {
+		CSXMetaDiagram csxMD = createMetaDiagram(_diagramNames);
+		
+		this.conditionMedaDiagramList.add(csxMD);
+	}
+	
+	private CSXMetaDiagram createMetaDiagram(String _diagramNames) {
+		CSXMetaDiagram csxMD= new CSXMetaDiagram();
+		
+		String[] diagramArray = _diagramNames.split("\\+");
+		
+		for( String diagName : diagramArray ) {
+			CSXDiagram diag = getDiagramByName(diagName);
+			
+			csxMD.addDiagram(diag);
+		}
+		
+		return csxMD;
+	}
+	
+	private CSXDiagram getDiagramByName(String _diagramName) {
+		int index = 0;
+						
+		while ( !_diagramName.equals(diagramObjectList.get(index).getDiagramName()) &&
+				index<diagramObjectList.size() ) {
+			index++;
+		}
+		
+		return diagramObjectList.get(index);
 	}
 
-	public void setDiagramNameList(ArrayList<String> diagramNameList) {
-		this.diagramNameList = diagramNameList;
+	public ArrayList<CSXMetaDiagram> getAttributeMetaDiagramList() {
+		return attributeMetaDiagramList;
 	}
 
+	public void setAttributeMetaDiagramList(
+			ArrayList<CSXMetaDiagram> attributeMetaDiagramList) {
+		this.attributeMetaDiagramList = attributeMetaDiagramList;
+	}
+
+	public ArrayList<CSXMetaDiagram> getConditionMedaDiagramList() {
+		return conditionMedaDiagramList;
+	}
+
+	public void setConditionMedaDiagramList(
+			ArrayList<CSXMetaDiagram> conditionMedaDiagramList) {
+		this.conditionMedaDiagramList = conditionMedaDiagramList;
+	}
 }
