@@ -52,18 +52,18 @@ public class ConditionSelectionFrame extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ConditionSelectionFrame frame = new ConditionSelectionFrame();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					ConditionSelectionFrame frame = new ConditionSelectionFrame();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -75,6 +75,14 @@ public class ConditionSelectionFrame extends JFrame {
 		list.add("Item two");
 		list.add("Item three");
 		list.add("Item four");
+		initializeConditionList(list);
+	}
+	
+	public ConditionSelectionFrame(ElbaCSXImporter controller) {
+		initializeGUI();
+		this.elbaCSXImporter = controller;
+		ArrayList<String> list = new ArrayList<String>();
+		list = this.elbaCSXImporter.getDiagramNameList();
 		initializeConditionList(list);
 	}
 
@@ -267,6 +275,7 @@ public class ConditionSelectionFrame extends JFrame {
 	
 	protected void addAttribute() {
 		String elem = combineItems();
+		
 		attributeListModel.addElement(elem);
 		attributeList.setModel(attributeListModel);
 	}
