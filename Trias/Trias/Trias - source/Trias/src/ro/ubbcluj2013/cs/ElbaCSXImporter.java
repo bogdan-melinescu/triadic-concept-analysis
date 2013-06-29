@@ -106,23 +106,22 @@ public class ElbaCSXImporter {
 		for( String diagName : diagramArray ) {
 			CSXDiagram diag = getDiagramByName(diagName);
 			
-			csxMD.addDiagram(diag);
+			if( diag != null ) {
+				csxMD.addDiagram(diag);
+			}			
 		}
 		
 		return csxMD;
 	}
 	
 	private CSXDiagram getDiagramByName(String _diagramName) {
-		int index = 0;
-						
-		while ( index<diagramObjectList.size() && !_diagramName.equals(diagramObjectList.get(index).getDiagramName())
-				 ) {
-			index++;
-		} 
-		if (index>0) 
-			index --;
+		for( CSXDiagram diag : diagramObjectList ) {
+			if( diag.getDiagramName().equals(_diagramName) ){
+				return diag;
+			}							
+		}
 		
-		return diagramObjectList.get(index);
+		return null;
 	}
 
 	public ArrayList<CSXMetaDiagram> getAttributeMetaDiagramList() {
