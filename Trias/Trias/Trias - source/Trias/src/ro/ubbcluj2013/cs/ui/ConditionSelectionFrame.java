@@ -147,7 +147,7 @@ public class ConditionSelectionFrame extends JFrame {
 		diagramList.setBounds(10, 34, 147, 181);
 		contentPane.add(diagramList);
 		
-		JLabel lblDiagrams = new JLabel("Diagrams:");
+		JLabel lblDiagrams = new JLabel("Scales:");
 		lblDiagrams.setBounds(10, 11, 104, 14);
 		contentPane.add(lblDiagrams);
 		
@@ -173,10 +173,13 @@ public class ConditionSelectionFrame extends JFrame {
 		btnRemoveSelectedAttribute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int pos = attributeList.getSelectedIndex();
+				String elem = "";
 				if (pos>=0) {
+					elem = attributeListModel.get(pos);
 					attributeListModel.remove(pos);
 					attributeList.setModel(attributeListModel);
 				}
+				restoreItem(elem);
 			}
 		});
 		btnRemoveSelectedAttribute.setBounds(219, 226, 194, 23);
@@ -186,10 +189,13 @@ public class ConditionSelectionFrame extends JFrame {
 		btnRemoveSelectedCondition.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int pos = conditionList.getSelectedIndex();
+				String elem = "";
 				if (pos>=0) {
+					elem = conditionListModel.get(pos);
 					conditionListModel.remove(pos);
 					conditionList.setModel(conditionListModel);
 				}
+				restoreItem(elem);
 			}
 		});
 		btnRemoveSelectedCondition.setBounds(219, 257, 194, 23);
@@ -197,6 +203,13 @@ public class ConditionSelectionFrame extends JFrame {
 	}
 	
 
+	private void restoreItem(String elem) {
+		String[] diags = elem.split("\\+");
+		for (String diag: diags) {
+			diagramListModel.addElement(diag);
+		}
+		diagramList.setModel(diagramListModel);
+	}
 	
 	protected void sendInfo() {
 		//getTriadicData(attrlist, condlist);
@@ -232,7 +245,6 @@ public class ConditionSelectionFrame extends JFrame {
 		attributeList.setModel(attributeListModel);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void moveItemToSelected () {
 		int pos = attributeList.getSelectedIndex();
 		if (pos >= 0) {
@@ -246,7 +258,6 @@ public class ConditionSelectionFrame extends JFrame {
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	protected void moveItemBack() {
 		int pos = conditionList.getSelectedIndex();
 		if (pos >= 0) {
@@ -265,6 +276,11 @@ public class ConditionSelectionFrame extends JFrame {
 		for (int i: positions) {
 			elem = elem + "+" + diagramListModel.get(i);
 		}
+		
+		for (int i=positions.length-1; i>=0; i--){
+			diagramListModel.remove(positions[i]);
+		}
+		
 		return elem;
 	}
 	
