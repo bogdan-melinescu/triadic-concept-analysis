@@ -84,10 +84,12 @@ public class ElbaCSXImporter {
 	private CSXDiagram getDiagramByName(String _diagramName) {
 		int index = 0;
 						
-		while ( !_diagramName.equals(diagramObjectList.get(index).getDiagramName()) &&
-				index<diagramObjectList.size() ) {
+		while ( index<diagramObjectList.size() && !_diagramName.equals(diagramObjectList.get(index).getDiagramName())
+				 ) {
 			index++;
-		}
+		} 
+		if (index>0) 
+			index --;
 		
 		return diagramObjectList.get(index);
 	}

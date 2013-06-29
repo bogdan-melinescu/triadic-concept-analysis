@@ -47,6 +47,7 @@ public class ConditionSelectionFrame extends JFrame {
 	private DefaultListModel<String> attributeListModel;
 	private JButton button;
 	private JLabel lblConditions;
+	
 	private ElbaCSXImporter elbaCSXImporter;
 	
 	/**

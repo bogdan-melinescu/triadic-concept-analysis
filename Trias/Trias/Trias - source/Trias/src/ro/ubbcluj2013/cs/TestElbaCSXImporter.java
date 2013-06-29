@@ -2,6 +2,8 @@ package ro.ubbcluj2013.cs;
 
 import java.util.ArrayList;
 
+import ro.ubbcluj2013.cs.ui.ConditionSelectionFrame;
+
 /**
  * The class that tests the csx importer
  */
@@ -12,6 +14,10 @@ public class TestElbaCSXImporter {
 		
 		elbaImporter = new ElbaCSXImporter("D:\\master\\sem1\\Knowledge discovery\\" + 
 				"ToscanaJ-1.7\\ToscanaJ-1.7\\examples\\sql\\diabetes\\diabetes.csx");
+		
+		
+		ConditionSelectionFrame c = new ConditionSelectionFrame(elbaImporter);
+		c.setVisible(true);
 		
 		ArrayList<CSXDiagram> localDiagramObjectList = elbaImporter.getDiagramObjectList();
 		
