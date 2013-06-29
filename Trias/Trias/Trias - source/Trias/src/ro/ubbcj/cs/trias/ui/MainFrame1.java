@@ -77,6 +77,12 @@ public class MainFrame1 extends JFrame{
 	private JTextField textField;
 	private JLabel lblNewLabel_7;
 	private JComboBox comboBox_algorithm;
+	private JTextField textField_tableName;
+	private JTextField textField_columnName;
+
+	private JLabel lblTableName;
+
+	private JLabel lblObjectColumnName;
 
 	/**
 	 * Create the application.
@@ -93,12 +99,12 @@ public class MainFrame1 extends JFrame{
 	private void initialize() {
 		frmTriasConcept = new JFrame();
 		frmTriasConcept.setTitle("Trias Concept ");
-		frmTriasConcept.setBounds(100, 100, 670, 367);
+		frmTriasConcept.setBounds(100, 100, 670, 436);
 		frmTriasConcept.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmTriasConcept.getContentPane().setLayout(null);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 11, 639, 318);
+		tabbedPane.setBounds(10, 11, 639, 376);
 		frmTriasConcept.getContentPane().add(tabbedPane);
 		
 		panel_3 = new JPanel();
@@ -164,11 +170,10 @@ public class MainFrame1 extends JFrame{
 				"separated by<br>some custom separator.</html>");
 		
 		panel_columns = new JPanel();
-		panel_columns.setBorder(new TitledBorder(null, "Select Columns:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_columns.setBounds(391, 110, 233, 125);
+		panel_columns.setBorder(new TitledBorder(null, "Select Columns:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_3.add(panel_columns);
 		panel_columns.setLayout(null);
-		panel_columns.setVisible(false);
 		
 		JLabel lblNewLabel_4 = new JLabel("Objects:");
 		lblNewLabel_4.setBounds(10, 24, 57, 14);
@@ -205,13 +210,31 @@ public class MainFrame1 extends JFrame{
 		lbl_TableName.setVisible(false);
 		
 		btn_selectRelations = new JButton("Select tricontext relations");
+		btn_selectRelations.setBounds(277, 244, 184, 23);
 		btn_selectRelations.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				SelectTricontextRelations();
 			}
 		});
-		btn_selectRelations.setBounds(277, 244, 184, 23);
 		panel_3.add(btn_selectRelations);
+		
+		textField_tableName = new JTextField();
+		textField_tableName.setBounds(176, 284, 155, 20);
+		panel_3.add(textField_tableName);
+		textField_tableName.setColumns(10);
+		
+		lblTableName = new JLabel("Table name :");
+		lblTableName.setBounds(10, 287, 162, 14);
+		panel_3.add(lblTableName);
+		
+		textField_columnName = new JTextField();
+		textField_columnName.setBounds(176, 315, 155, 20);
+		panel_3.add(textField_columnName);
+		textField_columnName.setColumns(10);
+		
+		lblObjectColumnName = new JLabel("Object column name :");
+		lblObjectColumnName.setBounds(10, 318, 156, 14);
+		panel_3.add(lblObjectColumnName);
 		btn_selectRelations.setVisible(false);
 		
 		panel_4 = new JPanel();
@@ -408,6 +431,8 @@ public class MainFrame1 extends JFrame{
 			}
 		});
 		btn_selectFile.setVisible(false);
+		
+		SetInvisibleItems();
 	}
 	
 	/**
@@ -451,6 +476,11 @@ public class MainFrame1 extends JFrame{
 		btn_selectFile.setVisible(true);
 		textField_inputFile.setVisible(true);
 		btn_selectRelations.setVisible(true);
+		textField_columnName.setVisible(true);
+		textField_tableName.setVisible(true);
+		lblTableName.setVisible(true);
+		lblObjectColumnName.setVisible(true);
+		
 		// COMMENT: Trebuie verificat daca aici trebuie precizat ca citesc dintr-o baza de date.
 		// Asta depinde de functiile lui George cred :-)
 		this.controller.SetDataSourceAndReadProperties(DataSource.DATABASE);
@@ -577,6 +607,11 @@ public class MainFrame1 extends JFrame{
 		lbl_TableName.setVisible(false);
 		comboBox_table.setVisible(false);
 		btn_selectRelations.setVisible(false);
+		textField_columnName.setVisible(false);
+		textField_tableName.setVisible(false);
+		lblTableName.setVisible(false);
+		lblObjectColumnName.setVisible(false);
+		
 	}
 	
 	/**
