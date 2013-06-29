@@ -786,4 +786,18 @@ public class MainFrame1 extends JFrame{
 		JOptionPane.showMessageDialog(this, text, "Error",
 				JOptionPane.ERROR_MESSAGE);
 	}
+	
+	/**
+	 * Get the table name from the text input
+	 */
+	public String getTableName() {
+		return textField_tableName.getText();
+	}
+	
+	/**
+	 * Get the column name from the text input
+	 */
+	public String getColumnName() {
+		return textField_columnName.getText();
+	}
 }
