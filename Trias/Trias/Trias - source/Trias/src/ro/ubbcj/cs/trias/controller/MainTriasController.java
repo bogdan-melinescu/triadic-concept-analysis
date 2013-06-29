@@ -172,31 +172,41 @@ public class MainTriasController {
 			Triple<String>[] triadicListArray;
 			Triple<String>[] tmpContext;
 			
-			String query = "SELECT `" + objectColName + "`, ";
+			String query = "";
 			TriasDatabaseSource databaseSource = new TriasDatabaseSource(
 					this.connection, query, new Object[0]);
 			
 			for (int i = 0; i < attributeWhereClause.size(); i++) {
-				query = query + "'" + attributeWhereClause.get(i) + "', "
-						+ "'" + conditionWhereClause.get(i) + "' "
-						+ "WHERE " + attributeWhereClause.get(i)
-						+ "AND " + conditionWhereClause.get(i);
-				
-				databaseSource = new TriasDatabaseSource(this.connection, query, new Object[0]);
-				
-				// I could need a method to add a new ItemList to the existing one
-				// triadicList.append(databaseSource.getItemlist())
-				
-				tmpContext = databaseSource.getItemlist().getRelation();
-				
-				for( Triple<String> trip : tmpContext ) {
-					triadicListVec.add(trip);
+				for (int j=0; j < conditionWhereClause.size(); j++) {
+					query = query + "(SELECT `" + objectColName + "`, ";
+					query = query + "'" + attributeWhereClause.get(i) + "', "
+							+ "'" + conditionWhereClause.get(j) + "' "
+							+ " FROM `" + tableName + "`"
+							+ " WHERE " + attributeWhereClause.get(i)
+							+ " AND " + conditionWhereClause.get(j)
+							+ ") UNION ";
+					
+					//databaseSource = new TriasDatabaseSource(this.connection, query, new Object[0]);
+					
+					// I could need a method to add a new ItemList to the existing one
+					// triadicList.append(databaseSource.getItemlist())
+					
+					//tmpContext = databaseSource.getItemlist().getRelation();
+					
+//					for( Triple<String> trip : tmpContext ) {
+//						triadicListVec.add(trip);
+//					}
 				}
 			}
 			
-			triadicListArray = (Triple<String>[]) new Object[triadicListVec.size()];
+			query = query.substring(0, query.length()-6);
+			databaseSource = new TriasDatabaseSource(this.connection, query, new Object[0]);
 			
-			triadicList = new Context<String>(triadicListArray);
+			//triadicListArray = (Triple<String>[]) new Object[triadicListVec.size()];
+			
+			
+			
+			triadicList = databaseSource.getItemlist();
 	
 			
 			this.itemList = triadicList;
@@ -245,7 +255,7 @@ public class MainTriasController {
 	 * @throws IOException - if the output file cannot be written
 	 * @throws RuntimeException - if openFile is true and graphviz is not installed on the system
 	 */
-	public void computeNeighborhoods(/*File outputFile, */int[] minSupport,
+	public void computeNeighborhoods(/*File outputFile,*/ int[] minSupport,
 			int[] thresholds, boolean openFile) throws IOException {
 
 		final ModelReaderWriter<String> mrw = new ModelReaderWriter<String>(
@@ -277,7 +287,7 @@ public class MainTriasController {
 		generator.setThresholds(thresholds);
 
 		log.info("Starting to compute tri-neighborhoods");
-		final Set<GraphEdge<TriConcept<String>>> graph = generator
+		graph = generator
 				.getNeighborhoodGraph();
 
 		log.info("Graph has " + graph.size() + " edges");
@@ -285,24 +295,10 @@ public class MainTriasController {
 		// COMMENT: Am comentat partea de deschidere fisier si creare fisier cu graful
 		// pentru ca acestea doua ar trebui separate
 
-		/*
-		 * write graphviz graph
-		 */
-/*		final GraphWriter<String> writer = new GraphWriter<String>(outputFile);
-
-		// TODO set dimension labels
-		// writer.setDimensionLabels(prop.getProperty("graph.labels").split(","));
-
-		writer.writeGraph(graph);
-		if (openFile) {
-			try {
-				Runtime.getRuntime().exec(
-						"gvedit.exe \"" + outputFile.getAbsolutePath() + "\"");
-			} catch (Exception ex) {
-				frame.putError("Could not open file. Graphviz not installed.");
-			}
-		}
-		*/
 		
+		//Am mutat in MainFrame1
 	}
+	
+	public Set<GraphEdge<TriConcept<String>>> graph;
+	
 }

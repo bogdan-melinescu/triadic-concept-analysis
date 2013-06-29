@@ -2,6 +2,9 @@ package ro.ubbcluj2013.cs;
 
 import java.util.ArrayList;
 
+import ro.ubbcj.cs.trias.controller.MainTriasController;
+import ro.ubbcj.cs.trias.ui.MainFrame1;
+
 
 /**
  * This is the class that handles importing data from the CSX file
@@ -21,7 +24,11 @@ public class ElbaCSXImporter {
 	private ArrayList<CSXMetaDiagram> attributeMetaDiagramList;
 	private ArrayList<CSXMetaDiagram> conditionMedaDiagramList;
 	
-	public ElbaCSXImporter(String _csxFilePath){
+	private MainFrame1 mainFrame;
+	
+	public ElbaCSXImporter(String _csxFilePath, MainFrame1 _mainFrame){
+		this.mainFrame = _mainFrame;
+		
 		this.csxFilePath = _csxFilePath;
 		
 		this.csxHandler = new CSXHandler_DOM( this.csxFilePath );
@@ -31,6 +38,30 @@ public class ElbaCSXImporter {
 		this.attributeMetaDiagramList = new ArrayList<CSXMetaDiagram>();
 		this.conditionMedaDiagramList = new ArrayList<CSXMetaDiagram>();
 	}
+	
+	public void sendLists() {
+		String tableName = mainFrame.getTableName();// = mainFrame.get
+		String objectColName = mainFrame.getColumnName(); // = mainFrame.get
+		
+		ArrayList<String> attributeWhereClause = new ArrayList<String>();
+		ArrayList<String> conditionWhereClause = new ArrayList<String>();
+		
+		for( CSXMetaDiagram csxMD : this.attributeMetaDiagramList ) {
+			for( String query : csxMD.getListOfQueries() ) {
+				attributeWhereClause.add(query);
+			}
+		}
+		
+		for( CSXMetaDiagram csxMD : this.conditionMedaDiagramList ) {
+			for( String query : csxMD.getListOfQueries() ) {
+				conditionWhereClause.add(query);
+			}
+		}
+		
+		mainFrame.getController().readDataFromDatabase(tableName, objectColName, attributeWhereClause, conditionWhereClause);
+	}
+	
+	
 	
 	//Getters and setters
 	public String getCsxFilePath() {

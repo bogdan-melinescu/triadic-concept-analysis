@@ -226,8 +226,12 @@ public class ConditionSelectionFrame extends JFrame {
 			//CSXMetaDiagram cmd = elbaCSXImporter.createMetaDiagram(atr);
 			elbaCSXImporter.addConditionMetaDiagram(atr); 
 		}
+		
+		
 		//send attributeList + condList
-		//elbaCSXImporter.sendLists();
+		elbaCSXImporter.sendLists();
+		
+		this.dispose();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
