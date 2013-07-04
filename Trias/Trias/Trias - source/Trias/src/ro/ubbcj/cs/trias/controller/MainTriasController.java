@@ -255,7 +255,7 @@ public class MainTriasController {
 	 * @throws IOException - if the output file cannot be written
 	 * @throws RuntimeException - if openFile is true and graphviz is not installed on the system
 	 */
-	public void computeNeighborhoods(/*File outputFile,*/ int[] minSupport,
+	public void computeNeighborhoods(File outputFile, int[] minSupport,
 			int[] thresholds, boolean openFile) throws IOException {
 
 		final ModelReaderWriter<String> mrw = new ModelReaderWriter<String>(
@@ -287,7 +287,7 @@ public class MainTriasController {
 		generator.setThresholds(thresholds);
 
 		log.info("Starting to compute tri-neighborhoods");
-		graph = generator
+		final Set<GraphEdge<TriConcept<String>>> graph = generator
 				.getNeighborhoodGraph();
 
 		log.info("Graph has " + graph.size() + " edges");
@@ -296,9 +296,29 @@ public class MainTriasController {
 		// pentru ca acestea doua ar trebui separate
 
 		
-		//Am mutat in MainFrame1
+		/*
+		 * write graphviz graph
+		 */
+		GraphWriter<String> writer;
+		try {
+			writer = new GraphWriter<String>(outputFile);
+
+			// TODO set dimension labels
+			// writer.setDimensionLabels(prop.getProperty("graph.labels").split(","));
+
+			writer.writeGraph(graph);
+			if (openFile) {
+				try {
+					System.out.println(outputFile.getAbsolutePath());
+					Runtime.getRuntime().exec(
+							"gvedit.exe \"" + outputFile.getAbsolutePath() + "\"");
+				} catch (Exception ex) {
+					System.out.println("Could not open file. Graphviz not installed.");
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
-	public Set<GraphEdge<TriConcept<String>>> graph;
-	
 }

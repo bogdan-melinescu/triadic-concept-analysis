@@ -80,7 +80,7 @@ public class MainFrame1 extends JFrame{
 	private JLabel lblNewLabel_7;
 	private JComboBox comboBox_algorithm;
 	private JTextField textField_tableName;
-	private JTextField textField_columnName;
+	private JComboBox comboBox_objectsForCSX;
 
 	private JLabel lblTableName;
 
@@ -229,14 +229,13 @@ public class MainFrame1 extends JFrame{
 		lblTableName.setBounds(10, 287, 162, 14);
 		panel_3.add(lblTableName);
 		
-		textField_columnName = new JTextField();
-		textField_columnName.setBounds(176, 315, 155, 20);
-		panel_3.add(textField_columnName);
-		textField_columnName.setColumns(10);
-		
 		lblObjectColumnName = new JLabel("Object column name :");
 		lblObjectColumnName.setBounds(10, 318, 156, 14);
 		panel_3.add(lblObjectColumnName);
+		
+		comboBox_objectsForCSX = new JComboBox();
+		comboBox_objectsForCSX.setBounds(176, 315, 155, 20);
+		panel_3.add(comboBox_objectsForCSX);
 		btn_selectRelations.setVisible(false);
 		
 		panel_4 = new JPanel();
@@ -473,21 +472,38 @@ public class MainFrame1 extends JFrame{
 	 * Select an *.csx file and set needed UI items to visible
 	 */
 	private void DataSourceHandling_CSX_SQLDatabase() {
+		this.controller.SetDataSourceAndReadProperties(DataSource.DATABASE);
+		this.populateFields();
 		lbl_fileChooser.setText("Choose an CSX file:");
 		lbl_fileChooser.setVisible(true);
 		btn_selectFile.setVisible(true);
 		textField_inputFile.setVisible(true);
 		btn_selectRelations.setVisible(true);
-		textField_columnName.setVisible(true);
-		textField_tableName.setVisible(true);
-		lblTableName.setVisible(true);
+		comboBox_objectsForCSX.setVisible(true);
+		//textField_tableName.setVisible(true);
+		//lblTableName.setVisible(true);
 		lblObjectColumnName.setVisible(true);
+		
+		//panel_columns.setVisible(true);
+		lbl_TableName.setVisible(true);
+		comboBox_table.setVisible(true);
 		
 		// COMMENT: Trebuie verificat daca aici trebuie precizat ca citesc dintr-o baza de date.
 		// Asta depinde de functiile lui George cred :-)
 		this.controller.SetDataSourceAndReadProperties(DataSource.DATABASE);
-		
-		
+	}
+	
+	/**
+	 * Populate the fields with information from the database for the CSX+SQL selection 
+	 */
+	private void populateFields() {
+		int selectedItemIndex = comboBox_sourceType.getSelectedIndex();
+		if ((selectedItemIndex != 0) && (selectedItemIndex != 4))
+		{
+			comboBox_table.setModel(new DefaultComboBoxModel(
+					this.controller.getTableNames().toArray(new String[0])));
+			UpdateColumnComboBoxes();
+		}
 	}
 
 	/**
@@ -573,6 +589,7 @@ public class MainFrame1 extends JFrame{
 		comboBox_objects.setModel(new DefaultComboBoxModel(columns));
 		comboBox_attributes.setModel(new DefaultComboBoxModel(columns));
 		comboBox_conditions.setModel(new DefaultComboBoxModel(columns));
+		comboBox_objectsForCSX.setModel(new DefaultComboBoxModel(columns));
 	}
 	
 	/**
@@ -613,10 +630,10 @@ public class MainFrame1 extends JFrame{
 		lbl_TableName.setVisible(false);
 		comboBox_table.setVisible(false);
 		btn_selectRelations.setVisible(false);
-		textField_columnName.setVisible(false);
 		textField_tableName.setVisible(false);
 		lblTableName.setVisible(false);
 		lblObjectColumnName.setVisible(false);
+		comboBox_objectsForCSX.setVisible(false);
 		
 	}
 	
@@ -680,10 +697,11 @@ public class MainFrame1 extends JFrame{
 			thresholds[0] = parseInteger(txt_threshold1.getText(), 1);
 			thresholds[1] = parseInteger(txt_threshold2.getText(), 1);
 			thresholds[2] = parseInteger(txt_threshold3.getText(), 1);
-
-			controller.computeNeighborhoods(minSupport, thresholds,
-					false);
-			saveToOutput();
+			
+			File outputFile = new File (this.txt_outputFolder.getText() + "\\" + this.textField_outputFile.getText());
+			boolean openFile = true;
+			controller.computeNeighborhoods(outputFile, minSupport, thresholds,
+					openFile);
 			JOptionPane.showMessageDialog(this,
 					"Neighbourhood generation completed successfully",
 					"Success", JOptionPane.INFORMATION_MESSAGE);
@@ -693,36 +711,7 @@ public class MainFrame1 extends JFrame{
 			// do nothing;
 		}
 	}
-	
-	private void saveToOutput() {
-		/*
-		 * write graphviz graph
-		 */
-		File outputFile = new File (this.txt_outputFolder.getText() + "\\" + this.textField_outputFile.getText());
-		GraphWriter<String> writer;
-		try {
-			writer = new GraphWriter<String>(outputFile);
-			boolean openFile = false;
 
-			// TODO set dimension labels
-			// writer.setDimensionLabels(prop.getProperty("graph.labels").split(","));
-
-			writer.writeGraph(controller.graph);
-			if (openFile) {
-				try {
-					Runtime.getRuntime().exec(
-							"gvedit.exe \"" + outputFile.getAbsolutePath() + "\"");
-				} catch (Exception ex) {
-					this.putError("Could not open file. Graphviz not installed.");
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
 	/*
 	 * We compute all the concepts
 	 */
@@ -742,7 +731,6 @@ public class MainFrame1 extends JFrame{
 
 
 			controller.computeAllConcepts(minSupport, thresholds);
-			saveToOutput();
 			JOptionPane.showMessageDialog(this,
 					"Concepts generation completed successfully",
 					"Success", JOptionPane.INFORMATION_MESSAGE);
@@ -836,13 +824,17 @@ public class MainFrame1 extends JFrame{
 	 * Get the table name from the text input
 	 */
 	public String getTableName() {
-		return textField_tableName.getText();
+		int pos = comboBox_table.getSelectedIndex();
+		System.out.println("Column NAME : " + comboBox_table.getModel().getElementAt(pos).toString());
+		return comboBox_table.getModel().getElementAt(pos).toString();
 	}
 	
 	/**
 	 * Get the column name from the text input
 	 */
 	public String getColumnName() {
-		return textField_columnName.getText();
+		int pos = comboBox_objectsForCSX.getSelectedIndex();
+		System.out.println("Column NAME : " + comboBox_objectsForCSX.getModel().getElementAt(pos).toString());
+		return comboBox_objectsForCSX.getModel().getElementAt(pos).toString();
 	}
 }
