@@ -1,6 +1,7 @@
 package ro.ubbcj.cs.trias;
 
-import ro.ubbcj.cs.trias.ui.MainFrame;
+import ro.ubbcj.cs.trias.controller.MainTriasController;
+import ro.ubbcj.cs.trias.ui.MainFrame1;
 import static javax.swing.WindowConstants.*;
 
 
@@ -8,8 +9,6 @@ public class Runner {
 
 	public static void main(String args[]) {
 		
-		MainFrame frame = new MainFrame();
-		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		frame.setVisible(true);
+		MainFrame1 frame = new MainFrame1(new MainTriasController());
 	}
 }
