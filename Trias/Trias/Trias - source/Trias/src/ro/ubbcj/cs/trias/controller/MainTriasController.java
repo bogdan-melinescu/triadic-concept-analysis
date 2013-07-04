@@ -218,7 +218,7 @@ public class MainTriasController {
 	/**
 	 * This method calls Trias, that computes all the contexts
 	 */
-	public void computeAllConcepts(int[] minSupport, int[] thresholds)
+	public TriConcept<String>[] computeAllConcepts(int[] minSupport, int[] thresholds)
 	{
 		final ModelReaderWriter<String> mrw = new ModelReaderWriter<String>(
 				itemList);
@@ -242,6 +242,9 @@ public class MainTriasController {
 		{
 			// TODO: nice error catching here
 		}
+		
+		final TriConcept<String>[] triConcepts = mrw.getTriLattice();
+		return triConcepts;
 	}
 	
 	/**
@@ -255,7 +258,7 @@ public class MainTriasController {
 	 * @throws IOException - if the output file cannot be written
 	 * @throws RuntimeException - if openFile is true and graphviz is not installed on the system
 	 */
-	public void computeNeighborhoods(File outputFile, int[] minSupport,
+	public Set<GraphEdge<TriConcept<String>>> computeNeighborhoods(/*File outputFile,*/ int[] minSupport,
 			int[] thresholds, boolean openFile) throws IOException {
 
 		final ModelReaderWriter<String> mrw = new ModelReaderWriter<String>(
@@ -292,33 +295,13 @@ public class MainTriasController {
 
 		log.info("Graph has " + graph.size() + " edges");
 		
+		return graph;
 		// COMMENT: Am comentat partea de deschidere fisier si creare fisier cu graful
 		// pentru ca acestea doua ar trebui separate
 
 		
-		/*
-		 * write graphviz graph
-		 */
-		GraphWriter<String> writer;
-		try {
-			writer = new GraphWriter<String>(outputFile);
-
-			// TODO set dimension labels
-			// writer.setDimensionLabels(prop.getProperty("graph.labels").split(","));
-
-			writer.writeGraph(graph);
-			if (openFile) {
-				try {
-					System.out.println(outputFile.getAbsolutePath());
-					Runtime.getRuntime().exec(
-							"gvedit.exe \"" + outputFile.getAbsolutePath() + "\"");
-				} catch (Exception ex) {
-					System.out.println("Could not open file. Graphviz not installed.");
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
+	
+	public Set<GraphEdge<TriConcept<String>>> graph;
+	
 }

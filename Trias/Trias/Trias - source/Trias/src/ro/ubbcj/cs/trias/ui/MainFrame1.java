@@ -34,9 +34,13 @@ import javax.swing.JTabbedPane;
 import java.awt.CardLayout;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 
+import de.unikassel.cs.kde.trias.model.GraphEdge;
+import de.unikassel.cs.kde.trias.model.TriConcept;
 import de.unikassel.cs.kde.trias.neighborhoods.GraphWriter;
 
 import ro.ubbcj.cs.trias.controller.MainTriasController;
@@ -76,11 +80,16 @@ public class MainFrame1 extends JFrame{
 	private JComboBox comboBox_conditions;
 	private JButton btn_selectRelations;
 	private JButton btn_startComputing;
-	private JTextField textField_outputFile;
+	private JTextField txt_outputFile;
 	private JLabel lblNewLabel_7;
 	private JComboBox comboBox_algorithm;
 	private JTextField textField_tableName;
 	private JComboBox comboBox_objectsForCSX;
+	private JTextField textField_columnName;
+	private JCheckBox chck_textFile;
+	private JCheckBox chck_tree;
+	private JCheckBox chck_XML;
+	private JCheckBox chck_Graph;
 
 	private JLabel lblTableName;
 
@@ -229,6 +238,11 @@ public class MainFrame1 extends JFrame{
 		lblTableName.setBounds(10, 287, 162, 14);
 		panel_3.add(lblTableName);
 		
+		textField_columnName = new JTextField();
+		textField_columnName.setBounds(176, 315, 155, 20);
+		panel_3.add(textField_columnName);
+		textField_columnName.setColumns(10);
+		
 		lblObjectColumnName = new JLabel("Object column name :");
 		lblObjectColumnName.setBounds(10, 318, 156, 14);
 		panel_3.add(lblObjectColumnName);
@@ -321,21 +335,21 @@ public class MainFrame1 extends JFrame{
 		panel_5.add(panel_6);
 		panel_6.setLayout(null);
 		
-		JCheckBox chck_textFile = new JCheckBox("Save a list of concepts inside a text file");
+		chck_textFile = new JCheckBox("Save a list of concepts inside a text file");
 		chck_textFile.setBounds(6, 7, 258, 23);
 		panel_6.add(chck_textFile);
 		
-		JCheckBox chck_XML = new JCheckBox("Save the concepts inside an XML file");
+		chck_XML = new JCheckBox("Save the concepts inside an XML file");
 		chck_XML.setBounds(6, 33, 258, 23);
 		panel_6.add(chck_XML);
 		
-		JCheckBox chckbxNewCheckBox_2 = new JCheckBox("Save a graph file (use ZGRViewer/GraphViz to open)");
-		chckbxNewCheckBox_2.setBounds(6, 59, 275, 23);
-		panel_6.add(chckbxNewCheckBox_2);
+		chck_Graph = new JCheckBox("Save a graph file (use ZGRViewer/GraphViz to open)");
+		chck_Graph.setBounds(6, 59, 275, 23);
+		panel_6.add(chck_Graph);
 		
-		JCheckBox chckbxNewCheckBox_3 = new JCheckBox("Show a concept tree");
-		chckbxNewCheckBox_3.setBounds(6, 85, 155, 23);
-		panel_6.add(chckbxNewCheckBox_3);
+		chck_tree = new JCheckBox("Show a concept tree");
+		chck_tree.setBounds(6, 85, 155, 23);
+		panel_6.add(chck_tree);
 		
 		txt_outputFolder = new JTextField();
 		txt_outputFolder.setBounds(28, 200, 302, 20);
@@ -364,10 +378,10 @@ public class MainFrame1 extends JFrame{
 		btn_startComputing.setBounds(459, 193, 133, 35);
 		panel_5.add(btn_startComputing);
 		
-		textField_outputFile = new JTextField();
-		textField_outputFile.setBounds(28, 249, 223, 20);
-		panel_5.add(textField_outputFile);
-		textField_outputFile.setColumns(10);
+		txt_outputFile = new JTextField();
+		txt_outputFile.setBounds(28, 249, 223, 20);
+		panel_5.add(txt_outputFile);
+		txt_outputFile.setColumns(10);
 		
 		lblNewLabel_7 = new JLabel("Enter a filename:");
 		lblNewLabel_7.setBounds(28, 231, 198, 14);
@@ -666,11 +680,13 @@ public class MainFrame1 extends JFrame{
 		if (result) {
 			if (comboBox_algorithm.getSelectedIndex() == 0)
 			{
-				computeConcepts();	
+				TriConcept<String>[] triConcepts = computeConcepts();
+				SaveOutput(triConcepts);
 			}
 			else 
 			{
-				computeNeighborhoods();
+				Set<GraphEdge<TriConcept<String>>> graph = computeNeighborhoods();
+				SaveOutput(graph);
 			}
 		}
 		
@@ -678,13 +694,66 @@ public class MainFrame1 extends JFrame{
 		
 		// COMMENT: not implemented yet
 		// we should keep the results inside the controller and create some new functions
-		// in the controller or in some output related class that create the files. 
+		// in the controller or in some output related class that creates the files. 
+	}
+	
+	/**
+	 *  Save the concept neighborhoods in a certain manner
+	 * @param graph
+	 */
+	private void SaveOutput(Set<GraphEdge<TriConcept<String>>> graph)
+	{
+		// we save a ZGRViewer / GraphViz viewable file
+		if (chck_Graph.isSelected())
+		{
+			String outputFile = txt_outputFolder.getText() + "\\" + txt_outputFile.getText();
+			
+			GraphWriter<String> writer;
+			try {
+				writer = new GraphWriter<String>(outputFile);
+				boolean openFile = false;
+
+				// TODO set dimension labels
+				// writer.setDimensionLabels(prop.getProperty("graph.labels").split(","));
+
+				writer.writeGraph(graph);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * Save the triConcepts in a certain manner, given the user's options
+	 * @param triConcepts
+	 */
+	private void SaveOutput(TriConcept<String>[] triConcepts)
+	{
+		// write text file
+		if (chck_textFile.isSelected())
+		{
+			String path = txt_outputFolder.getText() + "\\" + txt_outputFile.getText() + ".txt";
+		//	File file = new File (txt_outputFolder.getText());
+			try {
+				PrintWriter out = new PrintWriter(new File(path));
+				for (int i = 0; i < triConcepts.length; i++)
+				{
+					out.print(triConcepts[i].toString());
+					out.println();
+				}
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/*
 	 * Compute the concept neighborhoods
 	 */
-	private void computeNeighborhoods() {
+	private Set<GraphEdge<TriConcept<String>>> computeNeighborhoods() {
 		try {
 
 			int minSupport[] = new int[3];
@@ -698,24 +767,25 @@ public class MainFrame1 extends JFrame{
 			thresholds[1] = parseInteger(txt_threshold2.getText(), 1);
 			thresholds[2] = parseInteger(txt_threshold3.getText(), 1);
 			
-			File outputFile = new File (this.txt_outputFolder.getText() + "\\" + this.textField_outputFile.getText());
-			boolean openFile = true;
-			controller.computeNeighborhoods(outputFile, minSupport, thresholds,
-					openFile);
+			Set<GraphEdge<TriConcept<String>>> triGraph =
+				controller.computeNeighborhoods(minSupport, thresholds, false);
+	//		saveToOutput();
 			JOptionPane.showMessageDialog(this,
 					"Neighbourhood generation completed successfully",
 					"Success", JOptionPane.INFORMATION_MESSAGE);
+			return triGraph;
 		} catch (IOException ex) {
 			putError("Error writing output: " + ex);
 		} catch (NumberFormatException ex) {
 			// do nothing;
 		}
+		return null;
 	}
 
 	/*
 	 * We compute all the concepts
 	 */
-	private void computeConcepts() {
+	private TriConcept<String>[] computeConcepts() {
 		try {
 
 			int minSupport[] = new int[3];
@@ -729,14 +799,17 @@ public class MainFrame1 extends JFrame{
 			thresholds[1] = parseInteger(txt_threshold2.getText(), 1);
 			thresholds[2] = parseInteger(txt_threshold3.getText(), 1);
 
-
+			TriConcept<String>[] triConcepts =
 			controller.computeAllConcepts(minSupport, thresholds);
+//			saveToOutput();
 			JOptionPane.showMessageDialog(this,
 					"Concepts generation completed successfully",
 					"Success", JOptionPane.INFORMATION_MESSAGE);
+			return triConcepts;
 		} catch (NumberFormatException ex) {
 			// do nothing;
 		}
+		return null;
 	}
 	
 	/**
@@ -806,7 +879,7 @@ public class MainFrame1 extends JFrame{
 		boolean valid = true;
 		
 		// check for having paths inside text boxes (if needed)
-		// check for minSupport and threshold being in bounds
+		// check for minSupport and threshold being in bounds (if needed)
 		
 		return valid;
 	}
